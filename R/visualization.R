@@ -264,7 +264,7 @@ visualize_KEGG_diagram <- function(
         "Package 'org.Hs.eg.db' is not installed; returning empty list.\n",
         "Install it with:\n",
         "  if (!requireNamespace('BiocManager', quietly = TRUE)) install.packages('BiocManager')\n",
-        "  BiocManager::install('TxDb.Hsapiens.UCSC.hg19.knownGene')",
+        "  BiocManager::install('org.Hs.eg.db')",
       )
       return(list())
     }
