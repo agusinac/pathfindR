@@ -353,9 +353,9 @@ input_processing <- function(input, p_val_threshold = 0.05, pin_name_path = "Bio
         "Package 'org.Hs.eg.db' is not installed; returning input genes unchanged.\n",
         "Install it with:\n",
         "  if (!requireNamespace('BiocManager', quietly = TRUE)) install.packages('BiocManager')\n",
-        "  BiocManager::install('org.Hs.eg.db')",
+        "  BiocManager::install('org.Hs.eg.db')"
       )
-      convert2alias <- False
+      convert2alias <- FALSE
     }
     
     
