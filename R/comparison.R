@@ -63,6 +63,8 @@ combine_pathfindR_results <- function(result_A, result_B, plot_common = TRUE) {
 #'
 #' @param combined_df Data frame of combined pathfindR enrichment results
 #' @param selected_terms the vector of selected terms for creating the graph
+#' @param node_size Argument to indicate whether to use number of significant genes ('num_genes')
+#'  or the -log10(lowest p value) ('p_val') for adjusting the term node sizes (default = 'num_genes')
 #' (either IDs or term descriptions). If set to \code{'common'}, all of the
 #' common terms are used. (default = 'common')
 #' @inheritParams term_gene_graph

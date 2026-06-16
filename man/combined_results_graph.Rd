@@ -15,14 +15,17 @@ combined_results_graph(
 \arguments{
 \item{combined_df}{Data frame of combined pathfindR enrichment results}
 
-\item{selected_terms}{the vector of selected terms for creating the graph
-(either IDs or term descriptions). If set to \code{'common'}, all of the
-common terms are used. (default = 'common')}
+\item{selected_terms}{the vector of selected terms for creating the graph}
 
 \item{use_description}{Boolean argument to indicate whether term descriptions
 (in the 'Term_Description' column) should be used. (default = \code{FALSE})}
 
-\item{layout}{The type of layout to create (see \code{\link[ggraph]{ggraph}} for details. Default = 'stress')}
+\item{layout}{The type of layout to create (see \code{\link[ggraph]{ggraph}} for details. Default = \code{'stress'})}
+
+\item{node_size}{Argument to indicate whether to use number of significant genes ('num_genes')
+ or the -log10(lowest p value) ('p_val') for adjusting the term node sizes (default = 'num_genes')
+(either IDs or term descriptions). If set to \code{'common'}, all of the
+common terms are used. (default = 'common')}
 }
 \value{
 a  \code{\link[ggraph]{ggraph}} object containing the combined term-gene graph.

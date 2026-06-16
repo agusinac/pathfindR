@@ -67,10 +67,34 @@ enrichment_chart <- function(result_df, top_terms = 10, plot_by_cluster = FALSE,
     }
   }
 
-  # sort by lowest adj.p
-  if (order_by %in% colnames(result_df)) {
-      result_df <- result_df[order(result_df[[order_by]]), ]
-  } else stop("`order_by` column doesn't exist in `result_df`")
+  ### Order and filter for top N genes
+  if (!c(order_by %in% colnames(result_df))) {
+    stop("`order_by` column doesn't exist in `result_df`")
+
+      
+  } else {
+    col_values <- result_df[[order_by]]
+
+    if (anyNA(col_values)) {
+      stop("Column values of `order_by` cannot have NAs!")
+    } else {
+      result_df <- tryCatch(
+        {
+          result_df[order(result_df[[order_by]], decreasing = FALSE), ]
+        },
+        error = function(e) {
+          stop(
+            sprintf(
+              "`order_by` cannot be used to order the `result_df`",
+              order_by,
+              e$message
+            ),
+            call. = FALSE
+          )
+        }
+      )
+    }
+  }
 
   ## Filter for top_terms
   if (!is.null(top_terms)) {
