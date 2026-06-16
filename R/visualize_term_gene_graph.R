@@ -8,14 +8,14 @@
 #'   \item{Down_regulated}{the down-regulated genes in the input involved in the given term's gene set, comma-separated}
 #' }
 #' @param genes_df (optional) the input data that was used with \code{\link{run_pathfindR}} (default: \code{NULL}).
-#'   It must be a data frame with 3 columns: \enumerate{
+#'   It must be a data frame with 2 or 3 columns: \enumerate{
 #'   \item Gene.Symbol (required)
 #'   \item logFC (required)
 #'   \item adj.P.Val (optional)
 #' }
 #' @param num_terms Number of top enriched terms to use while creating the graph. Set to \code{NULL} to use
 #'  all enriched terms (default = 10, i.e. top 10 terms)
-#' @param layout The type of layout to create (see \code{\link[ggraph]{ggraph}} for details. Default = 'stress')
+#' @param layout The type of layout to create (see \code{\link[ggraph]{ggraph}} for details. Default = \code{'stress'})
 #' @param use_description Boolean argument to indicate whether term descriptions
 #'  (in the 'Term_Description' column) should be used. (default = \code{FALSE})
 #' @param use_edge_weights Boolean argument to indicate whether genes are weighted by their term interactions, similar to an Up-Set plot but in graph context (default = \code{FALSE}).
@@ -52,8 +52,6 @@
 #' by identifying shared and distinct significant term-related genes.
 #'
 #' @import ggraph
-#' @importFrom ggnewscale new_scale_fill
-#' @importFrom stats na.omit
 #' @export
 #'
 #' @examples
@@ -177,9 +175,33 @@ term_gene_graph <- function(
   }
 
   ### Order and filter for top N genes
-  if (order_by %in% colnames(result_df)) {
-      result_df <- result_df[order(result_df[[order_by]], decreasing = FALSE), ]
-  } else stop("`order_by` column doesn't exist in `result_df`")
+  if (!c(order_by %in% colnames(result_df))) {
+    stop("`order_by` column doesn't exist in `result_df`")
+
+      
+  } else {
+    col_values <- result_df[[order_by]]
+
+    if (anyNA(col_values)) {
+      stop("Column values of `order_by` cannot have NAs!")
+    } else {
+      result_df <- tryCatch(
+        {
+          result_df[order(result_df[[order_by]], decreasing = FALSE), ]
+        },
+        error = function(e) {
+          stop(
+            sprintf(
+              "`order_by` cannot be used to order the `result_df`",
+              order_by,
+              e$message
+            ),
+            call. = FALSE
+          )
+        }
+      )
+    }
+  }
 
   if (!is.null(num_terms)) {
     result_df <- result_df[1:num_terms, ]
@@ -355,7 +377,7 @@ term_gene_graph <- function(
     gene_term$size <- igraph::V(g)$size[!term_rows]
 
     if (!is.null(genes_df)) {
-      gene_term$logFC <- na.omit(igraph::V(g)$logFC)
+      gene_term$logFC <- stats::na.omit(igraph::V(g)$logFC)
       p1 <- p +
         # First gene layer
         ggraph::scale_edge_width(guide = "none") +
@@ -381,7 +403,7 @@ term_gene_graph <- function(
       if (!is.null(term_fill)) {
         p1 <- p1 +
           # Second Term layer
-          ggnewscale::new_scale_fill() +
+          structure(ggplot2::standardise_aes_names("fill"), class = "new_aes") +
           ggraph::geom_node_point(
             data = term_data,
             mapping = ggplot2::aes(
@@ -403,7 +425,7 @@ term_gene_graph <- function(
       } else {
         p1 <- p1 +
           # Second Term layer
-          ggnewscale::new_scale_fill() +
+          structure(ggplot2::standardise_aes_names("fill"), class = "new_aes") +
           ggraph::geom_node_point(
             data = term_data,
             mapping = ggplot2::aes(
@@ -441,7 +463,7 @@ term_gene_graph <- function(
       if (!is.null(term_fill)) {
         p1 <- p1 +
           # Second Term layer
-          ggnewscale::new_scale_fill() +
+          structure(ggplot2::standardise_aes_names("fill"), class = "new_aes") +
           ggraph::geom_node_point(
             data = term_data,
             mapping = ggplot2::aes(

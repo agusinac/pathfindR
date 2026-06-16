@@ -43,7 +43,6 @@ Imports:
     ggplot2,
     ggraph,
     ggupset,
-    ggnewscale,
     fpc,
     ggkegg (>= 1.4.0),
     grDevices,
