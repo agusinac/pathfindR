@@ -4,6 +4,9 @@
 - renamed `fetch_gene_set()` utility function to `fetch_gene_sets()`
 - removed the package start up message
 
+## Major Changes
+- Extended `term_gene_graph` with extra options, such as outputs list of graph and plot, `term_fill`, changed `node_size` to `term_size`, `use_edge_weights` and can handle `genes_df`.
+
 # pathfindR 2.7.0
 ## Minor Changes and Bug Fixes
 - Moved org.Hs.eg.db from "Imports" to "Suggests" per new CRAN policy. Relevant functions revert to default behaviour if the required package is not installed.

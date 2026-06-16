@@ -23,9 +23,6 @@ common terms are used. (default = 'common')}
 (in the 'Term_Description' column) should be used. (default = \code{FALSE})}
 
 \item{layout}{The type of layout to create (see \code{\link[ggraph]{ggraph}} for details. Default = 'stress')}
-
-\item{node_size}{Argument to indicate whether to use number of significant genes ('num_genes')
-or the -log10(lowest p value) ('p_val') for adjusting the node sizes (default = 'num_genes')}
 }
 \value{
 a  \code{\link[ggraph]{ggraph}} object containing the combined term-gene graph.
