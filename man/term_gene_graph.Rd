@@ -62,8 +62,7 @@ or the -log10(lowest p value) ('p_val') for adjusting the term node sizes (defau
 \item{term_node_color}{A character to customize the fill color of the terms when `term_fill` is not specified (default: \code{"#E5D7BF"}).}
 }
 \value{
-A list containing:
-\itemize{
+A list containing: \describe{
   \item{graph}{A \code{\link[igraph]{igraph}} object that was used as input for the term-gene graph.}
   \item{plot}{A \code{\link[ggraph]{ggraph}} object containing the term-gene graph.}
 }

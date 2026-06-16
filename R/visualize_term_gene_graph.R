@@ -27,8 +27,7 @@
 #' @param term_node_fill A character vector to customize the fill gradient colors of the term nodes when `term_fill` is supplied, color order is in low -> mid -> high (default: \code{c("#CCBB44", "white", "#4477AA")}).
 #' @param gene_node_color A character vector to customize the fill gradient colors of the term nodes when `genes_df` is not supplied, color order is in up -> down (default: \code{c("green", "red")}).
 #' @param term_node_color A character to customize the fill color of the terms when `term_fill` is not specified (default: \code{"#E5D7BF"}).
-#' @return A list containing:
-#' \itemize{
+#' @return A list containing: \describe{
 #'   \item{graph}{A \code{\link[igraph]{igraph}} object that was used as input for the term-gene graph.}
 #'   \item{plot}{A \code{\link[ggraph]{ggraph}} object containing the term-gene graph.}
 #' }
@@ -403,7 +402,7 @@ term_gene_graph <- function(
       if (!is.null(term_fill)) {
         p1 <- p1 +
           # Second Term layer
-          structure(ggplot2::standardise_aes_names("fill"), class = "new_aes") +
+          ggnewscale::new_scale_fill() +
           ggraph::geom_node_point(
             data = term_data,
             mapping = ggplot2::aes(
@@ -425,7 +424,7 @@ term_gene_graph <- function(
       } else {
         p1 <- p1 +
           # Second Term layer
-          structure(ggplot2::standardise_aes_names("fill"), class = "new_aes") +
+          ggnewscale::new_scale_fill() +
           ggraph::geom_node_point(
             data = term_data,
             mapping = ggplot2::aes(
@@ -463,7 +462,7 @@ term_gene_graph <- function(
       if (!is.null(term_fill)) {
         p1 <- p1 +
           # Second Term layer
-          structure(ggplot2::standardise_aes_names("fill"), class = "new_aes") +
+          ggnewscale::new_scale_fill() +
           ggraph::geom_node_point(
             data = term_data,
             mapping = ggplot2::aes(

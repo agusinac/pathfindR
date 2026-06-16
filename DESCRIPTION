@@ -43,6 +43,7 @@ Imports:
     ggplot2,
     ggraph,
     ggupset,
+    ggnewscale,
     fpc,
     ggkegg (>= 1.4.0),
     grDevices,
@@ -60,4 +61,3 @@ Suggests:
     mockery
 VignetteBuilder: knitr
 Config/roxygen2/version: 8.0.0
-RoxygenNote: 7.3.3
