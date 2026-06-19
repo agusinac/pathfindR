@@ -3,7 +3,7 @@
 ## Minor Changes and Bug Fixes
 - renamed `fetch_gene_set()` utility function to `fetch_gene_sets()`
 - removed the package start up message
-- Extended `term_gene_graph` with extra options, such as outputs list of graph and plot, `term_fill`, changed `node_size` to `term_size`, `use_edge_weights` and can handle `genes_df`.
+- Split `term_gene_graph` into `create_term_gene_graph` and `create_term_gene_plot`, one creates the `igraph` structure while the other visualises the graph based on the information available in the `igraph` object.
 
 # pathfindR 2.7.0
 ## Minor Changes and Bug Fixes
