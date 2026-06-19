@@ -108,30 +108,26 @@ term_gene_graph <- function(
   ### Order and filter for top N genes
   if (!c(order_by %in% colnames(result_df))) {
     stop("`order_by` column doesn't exist in `result_df`")
-
-  } else {
-    col_values <- result_df[[order_by]]
-
-    if (anyNA(col_values)) {
-      stop("Column values of `order_by` cannot have NAs!")
-    } else {
-      result_df <- tryCatch(
-        {
-          result_df[order(result_df[[order_by]], decreasing = FALSE), ]
-        },
-        error = function(e) {
-          stop(
-            sprintf(
-              "`order_by` cannot be used to order the `result_df`",
-              order_by,
-              e$message
-            ),
-            call. = FALSE
-          )
-        }
-      )
-    }
   }
+  col_values <- result_df[[order_by]]
+
+ if (anyNA(col_values)) {
+    stop("Column values of `order_by` cannot have NAs!")
+  }
+  result_df <- tryCatch(
+   {
+      result_df[order(result_df[[order_by]], decreasing = FALSE), ]
+    },
+    error = function(e) {
+      stop(
+        sprintf(
+          "`order_by` cannot be used to order the `result_df`",
+          order_by,
+          e$message
+        ),
+        call. = FALSE
+      )
+    })
 
   val_term_size <- c("num_genes", "p_val")
   if (!term_size %in% val_term_size) {
@@ -299,7 +295,7 @@ term_gene_graph <- function(
 #'      result_df = example_pathfindR_output
 #'      )
 #' plt <- term_gene_plot(g)
-term_gene_plot <- function(
+create_term_gene_plot <- function(
   graph,
   layout = "stress",
   gene_node_fill = c("#7E2795", "white", "#27AE60"),
@@ -315,12 +311,11 @@ term_gene_plot <- function(
 
   if (!inherits(graph, "igraph")) {
     stop("`graph` needs to be of class 'igraph'!")
-  } else {
-    term_fill <- igraph::V(graph)$term_fill
-    num_terms <- sum(igraph::V(graph)$type == "term")
-    gene_node_values <- igraph::V(graph)$logFC
-    term_node_values <- igraph::V(graph)$term_fill
-    weight_node_values <- igraph::E(graph)$weight
+  term_fill <- igraph::V(graph)$term_fill
+  num_terms <- sum(igraph::V(graph)$type == "term")
+  gene_node_values <- igraph::V(graph)$logFC
+  term_node_values <- igraph::V(graph)$term_fill
+  weight_node_values <- igraph::E(graph)$weight
   }
 
   if (length(gene_node_fill) == 3) {

@@ -78,7 +78,9 @@ test_that("`enrichment_chart()` -- produces a ggplot object with correct labels"
   expect_equal(labels$colour, expression(-log[10](p)))
   expect_equal(labels$x, "Fold Enrichment")
   expect_equal(labels$y, "Term_Description")
+})
 
+test_that("`enrichment_chart()` -- order_by arg-related tests", {
   # Change order_by
   expect_is(g <- enrichment_chart(example_pathfindR_output_clustered, order_by = "highest_p"),
       "ggplot")
