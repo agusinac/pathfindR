@@ -18,9 +18,9 @@ combined_results_graph(
 \item{selected_terms}{the vector of selected terms for creating the graph}
 
 \item{use_description}{Boolean argument to indicate whether term descriptions
-(in the 'Term_Description' column) should be used. (default = \code{FALSE})}
+(in the 'Term_Description' column) should be used. (default: \code{FALSE})}
 
-\item{layout}{The type of layout to create (see \code{\link[ggraph]{ggraph}} for details. Default = \code{'stress'})}
+\item{layout}{The type of layout to create (see \code{\link[ggraph]{ggraph}} for details (default: \code{'stress'})}
 
 \item{node_size}{Argument to indicate whether to use number of significant genes ('num_genes')
  or the -log10(lowest p value) ('p_val') for adjusting the term node sizes (default = 'num_genes')

@@ -90,6 +90,23 @@ test_that("`enrichment_chart()` -- produces a ggplot object with correct labels"
   expect_equal(labels$colour, expression(-log[10](p)))
   expect_equal(labels$x, "Fold Enrichment")
   expect_equal(labels$y, "Term_Description")
+
+  # check if order is correct
+  input_ordered <- example_pathfindR_output_clustered[order(example_pathfindR_output_clustered[["highest_p"]], decreasing = FALSE), ]
+  expect_equal(input_ordered$ID[1:10], g$data$ID)
+
+  tmp <- example_pathfindR_output
+
+  expect_error(
+    enrichment_chart(tmp, order_by = "INVALID"),
+    "`order_by` column doesn't exist in `result_df`"
+  )
+
+  tmp$INVALID <- NA
+  expect_error(
+    enrichment_chart(tmp, order_by = "INVALID"),
+    "Column values of `order_by` cannot have NAs!"
+  )
 })
 
 test_that("`enrichment_chart()` -- argument checks work", {

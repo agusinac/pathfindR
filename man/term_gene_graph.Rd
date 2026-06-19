@@ -7,17 +7,12 @@
 term_gene_graph(
   result_df,
   genes_df = NULL,
-  num_terms = 10,
-  layout = "stress",
-  use_description = FALSE,
-  use_edge_weights = FALSE,
+  order_by = "lowest_p",
   term_size = "num_genes",
   term_fill = NULL,
-  order_by = "lowest_p",
-  gene_node_fill = c("#7E2795", "white", "#27AE60"),
-  term_node_fill = c("#CCBB44", "white", "#4477AA"),
-  gene_node_color = c("green", "red"),
-  term_node_color = "#E5D7BF"
+  num_terms = 10,
+  use_description = FALSE,
+  use_edge_weights = FALSE
 )
 }
 \arguments{
@@ -36,81 +31,62 @@ term_gene_graph(
   \item adj.P.Val (optional)
 }}
 
-\item{num_terms}{Number of top enriched terms to use while creating the graph. Set to \code{NULL} to use
-all enriched terms (default = 10, i.e. top 10 terms)}
+\item{order_by}{Argument to order the `result_df`, this influences the `num_terms` displayed (default: \code{'lowest_p'}).}
 
-\item{layout}{The type of layout to create (see \code{\link[ggraph]{ggraph}} for details. Default = \code{'stress'})}
-
-\item{use_description}{Boolean argument to indicate whether term descriptions
-(in the 'Term_Description' column) should be used. (default = \code{FALSE})}
-
-\item{use_edge_weights}{Boolean argument to indicate whether genes are weighted by their term interactions, similar to an Up-Set plot but in graph context (default = \code{FALSE}).}
-
-\item{term_size}{Argument to indicate whether to use number of significant genes ('num_genes')
-or the -log10(lowest p value) ('p_val') for adjusting the term node sizes (default = 'num_genes')}
+\item{term_size}{Argument to indicate whether to use number of significant genes ('num_genes')}
 
 \item{term_fill}{Argument to indicate by what column to fill the term nodes (e.g. \code{term_fill = "Fold_Enrichment"}) (default: \code{NULL}).}
 
-\item{order_by}{Argument to order the `result_df`, this influences the `num_terms` displayed (default: \code{'lowest_p'}).}
+\item{num_terms}{Number of top enriched terms to use while creating the graph. Set to \code{NULL} to use
+all enriched terms (default = 10, i.e. top 10 terms)}
 
-\item{gene_node_fill}{A character vector to customize the fill gradient colors of the gene nodes when `genes_df` is supplied, color order is in low -> mid -> high (default: \code{c("#7E2795", "white", "#27AE60")}).}
+\item{use_description}{Boolean argument to indicate whether term descriptions
+(in the 'Term_Description' column) should be used. (default: \code{FALSE})}
 
-\item{term_node_fill}{A character vector to customize the fill gradient colors of the term nodes when `term_fill` is supplied, color order is in low -> mid -> high (default: \code{c("#CCBB44", "white", "#4477AA")}).}
-
-\item{gene_node_color}{A character vector to customize the fill gradient colors of the term nodes when `genes_df` is not supplied, color order is in up -> down (default: \code{c("green", "red")}).}
-
-\item{term_node_color}{A character to customize the fill color of the terms when `term_fill` is not specified (default: \code{"#E5D7BF"}).}
+\item{use_edge_weights}{Boolean argument to indicate whether genes are weighted by their term interactions, similar to an Up-Set plot but in graph context (default = \code{FALSE}).
+or the -log10(lowest p value) ('p_val') for adjusting the term node sizes (default: \code{'num_genes'})}
 }
 \value{
-A list containing: \describe{
-  \item{graph}{A \code{\link[igraph]{igraph}} object that was used as input for the term-gene graph.}
-  \item{plot}{A \code{\link[ggraph]{ggraph}} object containing the term-gene graph.}
-}
- Each node corresponds to an enriched term (beige), an up-regulated gene (green)
- or a down-regulated gene (red). An edge between a term and a gene indicates
- that the given term involves the gene. Size of a term node is proportional
- to either the number of genes (if \code{term_size = 'num_genes'}) or
- the -log10(lowest p value) (if \code{term_size = 'p_val'}).
-
- Extra information can be visualised by using the \code{genes_df} argument, which allows the gene nodes 
- to be colored by the `LogFC` values. The `term_fill` argument allows adding gradients of another parameter or a custom column
- that is added to the `result_df` and specified via `\code{term_fill = "custom_metric"}`. Finally, 'hub genes' can be visualised by using the 
- `use_edge_weights` argument to weight the edges of genes that are present in most pathways.
+A \link[igraph]{igraph} object
 }
 \description{
 Create Term-Gene Graph
 }
 \details{
-This function (adapted from the Gene-Concept network visualization
-by the R package \code{enrichplot}) can be utilized to visualize which input
-genes are involved in the enriched terms as a graph. The term-gene graph
-shows the links between genes and biological terms and allows for the
-investigation of multiple terms to which significant genes are related. The
-graph also enables determination of the overlap between the enriched terms
-by identifying shared and distinct significant term-related genes.
+This function constructs an \link[igraph]{igraph} object from pathfindR output, creating a network that connects enriched biological terms to their involved genes. 
+By default, the graph connects term nodes to up-regulated genes and down-regulated genes. 
+The size of term nodes can be adjusted by either the number of significant genes (`term_size = 'num_genes'`) or by the statistical significance 
+(`term_size = 'p_val'`, using -log10(lowest p value)).
+
+When `genes_df` is provided, gene nodes contain values and not mere up/down binary values, allowing visualization of 
+expression direction and magnitude. When `term_fill` is supplied, term nodes obtain values enabling simultaneous visualization of pathway enrichment strength.
+
+Setting `use_edge_weights = TRUE` highlights hub genes by weighting edges based on how many terms a gene participates in, similar to an Up-Set plot but in 
+a graph context. The `num_terms` parameter controls how many top enriched terms are included (default: top 10), and `order_by` determines the ordering 
+criterion for term selection. The resulting igraph object can be visualized using \link[pathfindR]{term_gene_plot}.
 }
 \examples{
 # Normal gene-term with up/down regulated genes
-p <- term_gene_graph(
+g <- term_gene_graph(
      result_df = example_pathfindR_output
      )
-p <- term_gene_graph(
+g <- term_gene_graph(
      result_df = example_pathfindR_output, 
      num_terms = 5
      )
-p <- term_gene_graph(
+g <- term_gene_graph(
      result_df = example_pathfindR_output, 
      term_size = 'p_val'
      )
 
 # Coloring the term nodes
-p <- term_gene_graph(
+g <- term_gene_graph(
      result_df = example_pathfindR_output, 
      term_fill = "Fold_Enrichment"
      )
 
 # Adding edge weights
-p <- term_gene_graph(
+g <- term_gene_graph(
      result_df = example_pathfindR_output, 
      term_fill = "Fold_Enrichment", 
      use_edge_weights = TRUE
