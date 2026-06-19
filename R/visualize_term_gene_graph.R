@@ -35,38 +35,38 @@
 #'
 #' Setting `use_edge_weights = TRUE` highlights hub genes by weighting edges based on how many terms a gene participates in, similar to an Up-Set plot but in 
 #' a graph context. The `num_terms` parameter controls how many top enriched terms are included (default: top 10), and `order_by` determines the ordering 
-#' criterion for term selection. The resulting igraph object can be visualized using \link[pathfindR]{term_gene_plot}.
+#' criterion for term selection. The resulting igraph object can be visualized using \link[pathfindR]{create_term_gene_plot}.
 #' 
 #' @import ggraph
 #' @export
 #'
 #' @examples
 #' # Normal gene-term with up/down regulated genes
-#' g <- term_gene_graph(
+#' g <- create_term_gene_graph(
 #'      result_df = example_pathfindR_output
 #'      )
-#' g <- term_gene_graph(
+#' g <- create_term_gene_graph(
 #'      result_df = example_pathfindR_output, 
 #'      num_terms = 5
 #'      )
-#' g <- term_gene_graph(
+#' g <- create_term_gene_graph(
 #'      result_df = example_pathfindR_output, 
 #'      term_size = 'p_val'
 #'      )
 #' 
 #' # Coloring the term nodes
-#' g <- term_gene_graph(
+#' g <- create_term_gene_graph(
 #'      result_df = example_pathfindR_output, 
 #'      term_fill = "Fold_Enrichment"
 #'      )
 #' 
 #' # Adding edge weights
-#' g <- term_gene_graph(
+#' g <- create_term_gene_graph(
 #'      result_df = example_pathfindR_output, 
 #'      term_fill = "Fold_Enrichment", 
 #'      use_edge_weights = TRUE
 #'      )
-term_gene_graph <- function(
+create_term_gene_graph <- function(
   result_df,
   genes_df = NULL,
   order_by = "lowest_p",
@@ -106,28 +106,10 @@ term_gene_graph <- function(
   }
 
   ### Order and filter for top N genes
-  if (!c(order_by %in% colnames(result_df))) {
-    stop("`order_by` column doesn't exist in `result_df`")
+  result_df <- isOrderable(order_by, result_df)
+  if (!is.data.frame(result_df)) {
+    stop(result_df)
   }
-  col_values <- result_df[[order_by]]
-
- if (anyNA(col_values)) {
-    stop("Column values of `order_by` cannot have NAs!")
-  }
-  result_df <- tryCatch(
-   {
-      result_df[order(result_df[[order_by]], decreasing = FALSE), ]
-    },
-    error = function(e) {
-      stop(
-        sprintf(
-          "`order_by` cannot be used to order the `result_df`",
-          order_by,
-          e$message
-        ),
-        call. = FALSE
-      )
-    })
 
   val_term_size <- c("num_genes", "p_val")
   if (!term_size %in% val_term_size) {
@@ -186,7 +168,7 @@ term_gene_graph <- function(
           by.y = "Gene.symbol",
           all = TRUE
         )
-      graph_df <- stats::na.omit(graph_df, cols = "Term")
+      graph_df <- graph_df[!is.na(graph_df$Term), ]
   }
 
   up_genes <- lapply(result_df$Up_regulated, function(x) unlist(strsplit(x, ", ")))
@@ -260,7 +242,7 @@ term_gene_graph <- function(
 
 #' Create Term-Gene Plot
 #' 
-#' @param graph A \link[igraph]{igraph} returned from \link[pathfindR]{term_gene_graph}.
+#' @param graph A \link[igraph]{igraph} returned from \link[pathfindR]{create_term_gene_graph}.
 #' @param layout The type of layout to create (see \code{\link[ggraph]{ggraph}} for details (default: \code{'stress'})
 #' @param gene_node_fill A character vector to customize the fill gradient colors of the gene nodes when `genes_df` is supplied, color order is in low -> mid -> high (default: \code{c("#7E2795", "white", "#27AE60")}).
 #' @param term_node_fill A character vector to customize the fill gradient colors of the term nodes when `term_fill` is supplied, color order is in low -> mid -> high (default: \code{c("#CCBB44", "white", "#4477AA")}).
@@ -275,7 +257,7 @@ term_gene_graph <- function(
 #' It displays which input genes are involved in enriched biological terms, showing connections between genes and pathway/terms nodes. 
 #' The graph facilitates investigation of multi-term relationships and identifies shared versus distinct genes across enriched terms.
 #'
-#' Node coloring depends on the inputs provided to \link[pathfindR]{term_gene_graph}:
+#' Node coloring depends on the inputs provided to \link[pathfindR]{create_term_gene_graph}:
 #' \itemize{
 #'   \item If `genes_df` was NOT supplied: term nodes are beige (`term_node_color`), up-regulated genes are green, and down-regulated genes are red.
 #'   \item If `genes_df` WAS supplied: gene nodes are colored by logFC using a gradient (`gene_node_fill`: default purple → white → green), 
@@ -283,7 +265,7 @@ term_gene_graph <- function(
 #' }
 #'
 #' Term node size reflects either the number of associated genes (`term_size = 'num_genes'`) or statistical significance (`term_size = 'p_val'`). 
-#' When `use_edge_weights = TRUE` was set in `term_gene_graph`, edge widths represent hub gene importance (genes appearing in multiple terms).
+#' When `use_edge_weights = TRUE` was set in `create_term_gene_graph`, edge widths represent hub gene importance (genes appearing in multiple terms).
 #' The layout can be customized via the `layout` parameter (default: "stress"), and legends automatically reflect the applied coloring schemes.
 #'
 #' @import ggraph
@@ -291,10 +273,10 @@ term_gene_graph <- function(
 #'
 #' @examples
 #' # Normal gene-term with up/down regulated genes
-#' g <- term_gene_graph(
+#' g <- create_term_gene_graph(
 #'      result_df = example_pathfindR_output
 #'      )
-#' plt <- term_gene_plot(g)
+#' plt <- create_term_gene_plot(g)
 create_term_gene_plot <- function(
   graph,
   layout = "stress",
@@ -311,12 +293,14 @@ create_term_gene_plot <- function(
 
   if (!inherits(graph, "igraph")) {
     stop("`graph` needs to be of class 'igraph'!")
+  }
+
+  # Extract essential values
   term_fill <- igraph::V(graph)$term_fill
   num_terms <- sum(igraph::V(graph)$type == "term")
   gene_node_values <- igraph::V(graph)$logFC
   term_node_values <- igraph::V(graph)$term_fill
   weight_node_values <- igraph::E(graph)$weight
-  }
 
   if (length(gene_node_fill) == 3) {
     if (!all(sapply(X = gene_node_fill, FUN = isColor))) {
@@ -491,6 +475,12 @@ create_term_gene_plot <- function(
             colour = "black",
             show.legend = TRUE
           ) +
+          # ggplot2::scale_fill_identity(
+          #   guide = "legend",
+          #   breaks = names(node_colors[1]),
+          #   labels = type_descriptions[1],
+          #   name = "Term Type"
+          # )
           ggplot2::scale_fill_manual(
             values = node_colors[1],
             labels = type_descriptions[1]

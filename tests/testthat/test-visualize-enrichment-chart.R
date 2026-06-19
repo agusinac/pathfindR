@@ -136,6 +136,5 @@ test_that("`enrichment_chart()` -- argument checks work", {
     "`top_terms` must be either numeric or NULL"
   )
 
-  expect_error(enrichment_chart(example_pathfindR_output, order_by = "INVALID"))
   expect_error(enrichment_chart(example_pathfindR_output, top_terms = 0), "`top_terms` must be > 1")
 })

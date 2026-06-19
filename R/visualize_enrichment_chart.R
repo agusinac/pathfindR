@@ -68,32 +68,9 @@ enrichment_chart <- function(result_df, top_terms = 10, plot_by_cluster = FALSE,
   }
 
   ### Order and filter for top N genes
-  if (!c(order_by %in% colnames(result_df))) {
-    stop("`order_by` column doesn't exist in `result_df`")
-
-      
-  } else {
-    col_values <- result_df[[order_by]]
-
-    if (anyNA(col_values)) {
-      stop("Column values of `order_by` cannot have NAs!")
-    } else {
-      result_df <- tryCatch(
-        {
-          result_df[order(result_df[[order_by]], decreasing = FALSE), ]
-        },
-        error = function(e) {
-          stop(
-            sprintf(
-              "`order_by` cannot be used to order the `result_df`",
-              order_by,
-              e$message
-            ),
-            call. = FALSE
-          )
-        }
-      )
-    }
+  result_df <- isOrderable(order_by, result_df)
+  if (!is.data.frame(result_df)) {
+    stop(result_df)
   }
 
   ## Filter for top_terms
@@ -129,7 +106,7 @@ enrichment_chart <- function(result_df, top_terms = 10, plot_by_cluster = FALSE,
       mapping = ggplot2::aes(x = .data$Fold_Enrichment,
                           y = .data$Term_Description)
         )
-  ## Adding -log10 transformation and label
+
   if (order_by %in% c("lowest_p", "highest_p")) {
       log_p <- -log10(result_df[[order_by]])
 
