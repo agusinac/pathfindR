@@ -25,6 +25,7 @@ reference:
       - plot_scores
       - term_gene_heatmap
       - term_gene_graph
+      - term_gene_plot
       - UpSet_plot
       - visualize_terms
       - cluster_graph_vis
