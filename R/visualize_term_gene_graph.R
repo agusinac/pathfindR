@@ -188,7 +188,7 @@ create_term_gene_graph <- function(
       # store logFC only for gene nodes
       #-----------------------------------------------------
       gene_names <- igraph::V(g)$name[cond_gene]
-      graph_df$logFC[match(gene_names, graph_df$Gene)]
+      gene_logFC <- graph_df$logFC[match(gene_names, graph_df$Gene)]
 
       # Create a full-length vector with NA for term nodes
       #-----------------------------------------------------
