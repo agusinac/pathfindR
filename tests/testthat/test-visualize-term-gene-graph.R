@@ -47,11 +47,6 @@ test_that("`create_term_gene_graph()` -- check arguments", {
   )
 
   expect_error(
-    create_term_gene_graph(example_pathfindR_output, term_size = "nonexistent"),
-    '`term_size` should be one of "num_genes", "p_val"'
-  )
-
-  expect_error(
     create_term_gene_graph(example_pathfindR_output, num_terms = "five"),
     "`num_terms` must either be numeric or NULL!"
   )
@@ -106,12 +101,23 @@ test_that("`create_term_gene_graph()` -- check igraph creation", {
   expect_is(igraph::V(g)$size, "numeric")
   expect_equal(sum(igraph::V(g)$type == "term"), 10)
 
+  expect_is(g <- create_term_gene_graph(example_pathfindR_output, genes_df, term_fill = "Fold_Enrichment", use_edge_weights = TRUE, term_size = "p_val"), "igraph")
+  expect_is(igraph::E(g)$weight, "numeric")
+  expect_is(igraph::V(g)$logFC, "numeric")
+  expect_is(igraph::V(g)$term_fill, "numeric")
+  expect_is(igraph::V(g)$size, "numeric")
+  expect_equal(sum(igraph::V(g)$type == "term"), 10)
+
   expect_is(g <- create_term_gene_graph(example_pathfindR_output, genes_df, term_fill = "Fold_Enrichment", use_edge_weights = TRUE, num_terms = 3), "igraph")
   expect_is(igraph::E(g)$weight, "numeric")
   expect_is(igraph::V(g)$logFC, "numeric")
   expect_is(igraph::V(g)$term_fill, "numeric")
   expect_is(igraph::V(g)$size, "numeric")
   expect_equal(sum(igraph::V(g)$type == "term"), 3)
+
+  ## Corrects `num_terms` to maximum number of rows of input
+  expect_is(g <- create_term_gene_graph(example_pathfindR_output, num_terms = 150), "igraph")
+  expect_equal(sum(igraph::V(g)$type == "term"), nrow(example_pathfindR_output))
 })
 
 
@@ -128,6 +134,11 @@ test_that("`create_term_gene_plot()` -- check arguments", {
   expect_error(
     create_term_gene_plot(g, gene_node_fill = c("green", "red")),
     "`gene_node_fill` needs to be of length 3!"
+  )
+
+  expect_error(
+    create_term_gene_plot(g, gene_node_fill = c("green", "red", "invalid")),
+    "Not all elements in `gene_node_fill` are valid colors!"
   )
 
   expect_error(
@@ -162,10 +173,14 @@ test_that("`create_term_gene_plot()` -- check arguments", {
 })
 
 test_that("`create_term_gene_plot()` -- Check ggraph creation", {
-  ## Checking functional behavior
+  ## Default functionality
   g <- create_term_gene_graph(example_pathfindR_output, term_fill = "Fold_Enrichment")
   expect_is(p <- create_term_gene_plot(g), "ggraph")  
 
+  g <- create_term_gene_graph(example_pathfindR_output)
+  expect_is(p <- create_term_gene_plot(g), "ggraph")
+
+  ## `genes_df` is included
   genes_df <- example_pathfindR_input[, c(1, 2, 3)]
   g <- create_term_gene_graph(example_pathfindR_output, genes_df, term_fill = "Fold_Enrichment")
   expect_is(p <- create_term_gene_plot(g), "ggraph")

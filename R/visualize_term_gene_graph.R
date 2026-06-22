@@ -475,12 +475,6 @@ create_term_gene_plot <- function(
             colour = "black",
             show.legend = TRUE
           ) +
-          # ggplot2::scale_fill_identity(
-          #   guide = "legend",
-          #   breaks = names(node_colors[1]),
-          #   labels = type_descriptions[1],
-          #   name = "Term Type"
-          # )
           ggplot2::scale_fill_manual(
             values = node_colors[1],
             labels = type_descriptions[1]
@@ -547,13 +541,12 @@ create_term_gene_plot <- function(
           max.overlaps = 20
         )
     )
-  if (is.null(num_terms)) {
-    p <- p + ggplot2::ggtitle("Term-Gene Graph")
-  } else {
-    p <- p + ggplot2::ggtitle("Term-Gene Graph", subtitle = paste(c(
-      "Top", num_terms,
-      "terms"
-    ), collapse = " "))
+  if (!is.null(num_terms)) {
+    p <- p + ggplot2::ggtitle(
+      "Term-Gene Graph", 
+      subtitle = paste(c("Top", num_terms, "terms"), 
+      collapse = " ")
+    )
   }
 
   p <- p + ggplot2::theme(
